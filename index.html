@@ -191,7 +191,7 @@
     }
 
     function tweet() {
-      const resultUrl = `${BASE_URL}/result/${resultToFilename(result)}.html`;
+      const resultUrl = `${BASE_URL}/result/${resultToFilename(result)}`;
       const text = `そぽたんスロットの結果は「${result}」でした！\n\n#そぽたんスロット\n${resultUrl}`;
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');

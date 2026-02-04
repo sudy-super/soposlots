@@ -23,7 +23,7 @@ const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCT
   <meta property="og:title" content="${ogpTitle}">
   <meta property="og:description" content="そぽたんスロットを回しました">
   <meta property="og:image" content="${ogpImage}">
-  <meta property="og:url" content="${BASE_URL}/result/${resultToFilename(result)}.html">
+  <meta property="og:url" content="${BASE_URL}/result/${resultToFilename(result)}">
   <meta name="twitter:card" content="summary_large_image">
   <style>
     body {
