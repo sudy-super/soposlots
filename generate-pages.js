@@ -7,14 +7,14 @@ const BASE_URL = 'https://soposlots.sudy.me';
 const OUTPUT_DIR = path.join(__dirname, 'result');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 
-const template = (result, ogpImage, message, resultDisplay) => `<!DOCTYPE html>
+const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${result} - そぽたんスロット</title>
-  <meta property="og:title" content="そぽたんスロットの結果は「${result}」！">
-  <meta property="og:description" content="あなたもそぽたんスロットを回してみよう！">
+  <meta property="og:title" content="${ogpTitle}">
+  <meta property="og:description" content="そぽたんスロットを回しました">
   <meta property="og:image" content="${ogpImage}">
   <meta property="og:url" content="${BASE_URL}/result/${encodeURIComponent(result)}.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -80,7 +80,8 @@ for (let i = 0; i < 4; i++) {
         const resultDisplay = isSopotan
           ? `<img src="../image/sopotan.png" alt="そぽたん">`
           : result;
-        const html = template(result, ogpImage, message, resultDisplay);
+        const ogpTitle = isSopotan ? 'そぽ〜' : 'そぽたんになれませんでした...';
+        const html = template(result, ogpImage, ogpTitle, message, resultDisplay);
         fs.writeFileSync(path.join(OUTPUT_DIR, `${result}.html`), html);
         count++;
       }
