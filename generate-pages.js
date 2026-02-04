@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // デプロイ後に実際のURLに変更してください
-const BASE_URL = 'https://sopotan.example.com';
+const BASE_URL = 'https://soposlots.sudy.me';
 
 const OUTPUT_DIR = path.join(__dirname, 'result');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
