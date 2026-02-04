@@ -71,32 +71,50 @@ async function generateSopotanOGP(sopotanImg) {
   return canvas.toBuffer('image/png');
 }
 
-// index.html用のOGP画像を生成
-async function generateIndexOGP(sopotanImg) {
+// index.html用のOGP画像を生成（サイトのスクショ風）
+function generateIndexOGP() {
   const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext('2d');
 
-  // 背景
-  ctx.fillStyle = '#fafafa';
+  // 背景（白）
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   // タイトル
   ctx.fillStyle = '#333';
-  ctx.font = 'bold 48px sans-serif';
+  ctx.font = 'bold 72px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('そぽたんスロット', WIDTH / 2, 100);
+  ctx.fillText('そぽたんスロット', WIDTH / 2, 180);
 
-  // sopotan.png画像を中央に配置（大きめに表示）
-  const imgHeight = 350;
-  const imgWidth = (sopotanImg.width / sopotanImg.height) * imgHeight;
-  const imgX = (WIDTH - imgWidth) / 2;
-  const imgY = 130;
-  ctx.drawImage(sopotanImg, imgX, imgY, imgWidth, imgHeight);
+  // スロットリール（4つのボックス）
+  const reelWidth = 120;
+  const reelHeight = 160;
+  const reelGap = 20;
+  const totalWidth = reelWidth * 4 + reelGap * 3;
+  const startX = (WIDTH - totalWidth) / 2;
+  const reelY = 280;
 
-  // サブテキスト
-  ctx.fillStyle = '#666';
-  ctx.font = '36px sans-serif';
-  ctx.fillText('お前もそぽたんにならないか？', WIDTH / 2, 560);
+  const chars = ['そ', 'ぽ', 'た', 'ん'];
+
+  for (let i = 0; i < 4; i++) {
+    const x = startX + i * (reelWidth + reelGap);
+
+    // リールの背景
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x, reelY, reelWidth, reelHeight);
+
+    // リールの枠線
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(x, reelY, reelWidth, reelHeight, 16);
+    ctx.stroke();
+
+    // 文字
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 80px sans-serif';
+    ctx.fillText(chars[i], x + reelWidth / 2, reelY + reelHeight / 2 + 28);
+  }
 
   return canvas.toBuffer('image/png');
 }
@@ -113,7 +131,7 @@ async function main() {
   const sopotanImg = await loadImage(SOPOTAN_IMAGE);
 
   // index.html用のOGP画像を生成
-  const indexOgpBuffer = await generateIndexOGP(sopotanImg);
+  const indexOgpBuffer = generateIndexOGP();
   fs.writeFileSync(path.join(OUTPUT_DIR, 'ogp.png'), indexOgpBuffer);
   console.log('index用OGP画像を生成しました: ogp.png');
 
