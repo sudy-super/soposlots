@@ -8,8 +8,9 @@ const OUTPUT_DIR = path.join(__dirname, 'result');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 
 // 日本語結果を英数字ファイル名に変換
+const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n' };
 function resultToFilename(result) {
-  return result.split('').map(c => CHARS.indexOf(c)).join('');
+  return result.split('').map(c => CHAR_MAP[c]).join('');
 }
 
 const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCTYPE html>
@@ -22,6 +23,7 @@ const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCT
   <meta property="og:title" content="${ogpTitle}">
   <meta property="og:description" content="そぽたんスロットを回しました">
   <meta property="og:image" content="${ogpImage}">
+  <meta property="og:url" content="${BASE_URL}/result/${resultToFilename(result)}.html">
   <meta name="twitter:card" content="summary_large_image">
   <style>
     body {
@@ -87,7 +89,8 @@ for (let i = 0; i < 4; i++) {
           : result;
         const ogpTitle = isSopotan ? 'そぽ〜' : 'そぽたんになれませんでした...';
         const html = template(result, ogpImage, ogpTitle, message, resultDisplay);
-        fs.writeFileSync(path.join(OUTPUT_DIR, `${result}.html`), html);
+        const filename = resultToFilename(result);
+        fs.writeFileSync(path.join(OUTPUT_DIR, `${filename}.html`), html);
         count++;
       }
     }

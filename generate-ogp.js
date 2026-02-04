@@ -7,8 +7,9 @@ const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 const SOPOTAN_IMAGE = path.join(__dirname, 'image', 'sopotan.png');
 
 // 日本語結果を英数字ファイル名に変換
+const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n' };
 function resultToFilename(result) {
-  return result.split('').map(c => CHARS.indexOf(c)).join('');
+  return result.split('').map(c => CHAR_MAP[c]).join('');
 }
 
 const WIDTH = 1200;
@@ -70,6 +71,36 @@ async function generateSopotanOGP(sopotanImg) {
   return canvas.toBuffer('image/png');
 }
 
+// index.html用のOGP画像を生成
+async function generateIndexOGP(sopotanImg) {
+  const canvas = createCanvas(WIDTH, HEIGHT);
+  const ctx = canvas.getContext('2d');
+
+  // 背景
+  ctx.fillStyle = '#fafafa';
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // タイトル
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('そぽたんスロット', WIDTH / 2, 100);
+
+  // sopotan.png画像を中央に配置（大きめに表示）
+  const imgHeight = 350;
+  const imgWidth = (sopotanImg.width / sopotanImg.height) * imgHeight;
+  const imgX = (WIDTH - imgWidth) / 2;
+  const imgY = 130;
+  ctx.drawImage(sopotanImg, imgX, imgY, imgWidth, imgHeight);
+
+  // サブテキスト
+  ctx.fillStyle = '#666';
+  ctx.font = '36px sans-serif';
+  ctx.fillText('お前もそぽたんにならないか？', WIDTH / 2, 560);
+
+  return canvas.toBuffer('image/png');
+}
+
 async function main() {
   // imageディレクトリ作成
   if (!fs.existsSync(OUTPUT_DIR)) {
@@ -80,6 +111,11 @@ async function main() {
 
   // sopotan.pngを読み込み
   const sopotanImg = await loadImage(SOPOTAN_IMAGE);
+
+  // index.html用のOGP画像を生成
+  const indexOgpBuffer = await generateIndexOGP(sopotanImg);
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'ogp.png'), indexOgpBuffer);
+  console.log('index用OGP画像を生成しました: ogp.png');
 
   let count = 0;
   for (let i = 0; i < 4; i++) {

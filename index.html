@@ -7,7 +7,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="そぽたんスロット">
   <meta property="og:description" content="お前もそぽたんにならないか？">
-  <meta property="og:image" content="https://soposlots.sudy.me/image/0123.png">
+  <meta property="og:image" content="https://soposlots.sudy.me/image/ogp.png">
   <meta property="og:url" content="https://soposlots.sudy.me/">
   <meta name="twitter:card" content="summary_large_image">
   <style>
@@ -184,8 +184,14 @@
       });
     }
 
+    // 日本語結果を英数字ファイル名に変換
+    const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n' };
+    function resultToFilename(result) {
+      return result.split('').map(c => CHAR_MAP[c]).join('');
+    }
+
     function tweet() {
-      const resultUrl = `${BASE_URL}/result/${encodeURIComponent(result)}.html`;
+      const resultUrl = `${BASE_URL}/result/${resultToFilename(result)}.html`;
       const text = `そぽたんスロットの結果は「${result}」でした！\n\n#そぽたんスロット\n${resultUrl}`;
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
