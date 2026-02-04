@@ -7,6 +7,11 @@ const BASE_URL = 'https://soposlots.sudy.me';
 const OUTPUT_DIR = path.join(__dirname, 'result');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 
+// 日本語結果を英数字ファイル名に変換
+function resultToFilename(result) {
+  return result.split('').map(c => CHARS.indexOf(c)).join('');
+}
+
 const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -73,8 +78,8 @@ for (let i = 0; i < 4; i++) {
       for (let l = 0; l < 4; l++) {
         const result = CHARS[i] + CHARS[j] + CHARS[k] + CHARS[l];
         const isSopotan = result === 'そぽたん';
-        // OGP画像（そぽたんも含めすべて生成されたものを使用）
-        const ogpImage = `${BASE_URL}/image/${encodeURIComponent(result)}.png`;
+        // OGP画像（英数字ファイル名を使用）
+        const ogpImage = `${BASE_URL}/image/${resultToFilename(result)}.png`;
         const message = isSopotan
           ? 'が出ました！'
           : '残念！そぽたんになれませんでした...';

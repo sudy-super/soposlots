@@ -6,6 +6,11 @@ const OUTPUT_DIR = path.join(__dirname, 'image');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 const SOPOTAN_IMAGE = path.join(__dirname, 'image', 'sopotan.png');
 
+// 日本語結果を英数字ファイル名に変換
+function resultToFilename(result) {
+  return result.split('').map(c => CHARS.indexOf(c)).join('');
+}
+
 const WIDTH = 1200;
 const HEIGHT = 630;
 
@@ -89,7 +94,8 @@ async function main() {
           } else {
             buffer = generateOGP(result);
           }
-          fs.writeFileSync(path.join(OUTPUT_DIR, `${result}.png`), buffer);
+          const filename = resultToFilename(result);
+          fs.writeFileSync(path.join(OUTPUT_DIR, `${filename}.png`), buffer);
           count++;
         }
       }

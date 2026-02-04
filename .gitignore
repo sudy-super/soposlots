@@ -6,5 +6,4 @@ public/
 
 # Generated files
 result/
-image/*.png
-!image/sopotan.png
+image/[0-3][0-3][0-3][0-3].png
