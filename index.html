@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>そぽたんスロット</title>
+  <meta property="og:title" content="そぽたんスロット">
+  <meta property="og:description" content="そぽたんの運勢を占おう！">
+  <meta property="og:image" content="https://sopotan.example.com/image/%E3%81%9D%E3%81%BD%E3%81%9F%E3%82%93.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { font-size: 1.5rem; }
+    #slot-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 40px 0;
+    }
+    .reel {
+      width: 60px;
+      height: 80px;
+      font-size: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+    }
+    #cooldown {
+      color: #e74c3c;
+      margin: 20px 0;
+    }
+    button {
+      font-size: 1rem;
+      padding: 12px 24px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      margin: 5px;
+    }
+    #spin-btn {
+      background: #333;
+      color: white;
+    }
+    #spin-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #tweet-btn {
+      display: none;
+      background: #1da1f2;
+      color: white;
+    }
+    #sopotan-image {
+      display: none;
+      margin: 40px 0;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #sopotan-image.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    #sopotan-image img {
+      max-width: 100%;
+      height: auto;
+    }
+    #slot-container {
+      transition: opacity 0.3s ease;
+    }
+    #slot-container.fade-out {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>そぽたんスロット</h1>
+  <div id="slot-container">
+    <div class="reel" id="reel0">そ</div>
+    <div class="reel" id="reel1">ぽ</div>
+    <div class="reel" id="reel2">た</div>
+    <div class="reel" id="reel3">ん</div>
+  </div>
+  <div id="sopotan-image">
+    <img src="image/sopotan.png" alt="そぽたん">
+  </div>
+  <div id="cooldown"></div>
+  <button id="spin-btn">まわす</button>
+  <button id="tweet-btn">ツイートする</button>
+
+  <script>
+    // デプロイ後に実際のURLに変更してください
+    const BASE_URL = 'https://sopotan.example.com';
+    const CHARS = ['そ', 'ぽ', 'た', 'ん'];
+    const COOLDOWN_MS = 60 * 60 * 1000; // 1時間
+    let result = '';
+    let isSpinning = false;
+
+    function checkCooldown() {
+      const lastSpin = localStorage.getItem('lastSpinTime');
+      if (!lastSpin) {
+        document.getElementById('cooldown').textContent = '';
+        document.getElementById('spin-btn').disabled = false;
+        return true;
+      }
+      const elapsed = Date.now() - parseInt(lastSpin, 10);
+      if (elapsed >= COOLDOWN_MS) {
+        document.getElementById('cooldown').textContent = '';
+        document.getElementById('spin-btn').disabled = false;
+        return true;
+      }
+      const remaining = COOLDOWN_MS - elapsed;
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      document.getElementById('cooldown').textContent = `次に回せるまで: ${minutes}分${seconds}秒`;
+      document.getElementById('spin-btn').disabled = true;
+      return false;
+    }
+
+    function spin() {
+      const params = new URLSearchParams(window.location.search);
+      const isTestMode = params.get('test') !== null;
+      if ((!isTestMode && !checkCooldown()) || isSpinning) return;
+      isSpinning = true;
+      document.getElementById('tweet-btn').style.display = 'none';
+      document.getElementById('slot-container').style.display = 'flex';
+      document.getElementById('slot-container').classList.remove('fade-out');
+      document.getElementById('sopotan-image').style.display = 'none';
+      document.getElementById('sopotan-image').classList.remove('show');
+
+      // テストモード: URLパラメータで結果を指定可能
+      const testResult = params.get('test');
+      const finalChars = (testResult && testResult.length === 4)
+        ? testResult.split('')
+        : [0, 1, 2, 3].map(() => CHARS[Math.floor(Math.random() * 4)]);
+      let completed = 0;
+
+      [0, 1, 2, 3].forEach((idx) => {
+        let count = 0;
+        const stopAt = 10 + idx * 5;
+        const interval = setInterval(() => {
+          document.getElementById(`reel${idx}`).textContent = CHARS[Math.floor(Math.random() * 4)];
+          count++;
+          if (count >= stopAt) {
+            clearInterval(interval);
+            document.getElementById(`reel${idx}`).textContent = finalChars[idx];
+            completed++;
+            if (completed === 4) {
+              result = finalChars.join('');
+              if (!isTestMode) {
+                localStorage.setItem('lastSpinTime', Date.now().toString());
+              }
+              document.getElementById('tweet-btn').style.display = 'inline-block';
+              isSpinning = false;
+              checkCooldown();
+              // そぽたんが揃った時の特別演出
+              if (result === 'そぽたん') {
+                setTimeout(() => {
+                  document.getElementById('slot-container').classList.add('fade-out');
+                  setTimeout(() => {
+                    document.getElementById('slot-container').style.display = 'none';
+                    const sopotanImage = document.getElementById('sopotan-image');
+                    sopotanImage.style.display = 'block';
+                    // 強制的にリフローを発生させてからアニメーション開始
+                    sopotanImage.offsetHeight;
+                    sopotanImage.classList.add('show');
+                  }, 300);
+                }, 500);
+              }
+            }
+          }
+        }, 80);
+      });
+    }
+
+    function tweet() {
+      const resultUrl = `${BASE_URL}/result/${encodeURIComponent(result)}.html`;
+      const text = `そぽたんスロットの結果は「${result}」でした！\n\n#そぽたんスロット\n${resultUrl}`;
+      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    document.getElementById('spin-btn').addEventListener('click', spin);
+    document.getElementById('tweet-btn').addEventListener('click', tweet);
+
+    checkCooldown();
+    setInterval(checkCooldown, 1000);
+  </script>
+</body>
+</html>

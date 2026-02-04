@@ -1,0 +1,18 @@
+{
+  "name": "sopotan-slot",
+  "version": "1.0.0",
+  "description": "そぽたんスロット",
+  "scripts": {
+    "generate:ogp": "node generate-ogp.js",
+    "generate:pages": "node generate-pages.js",
+    "generate": "npm run generate:ogp && npm run generate:pages",
+    "build": "rm -rf public && mkdir public && cp index.html public/ && cp -r image public/ && cp -r result public/",
+    "deploy": "npm run build && wrangler pages deploy public --project-name=sopotan-slot"
+  },
+  "dependencies": {
+    "canvas": "^3.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
