@@ -18,11 +18,14 @@ const template = (result, ogpImage, ogpTitle, message, resultDisplay) => `<!DOCT
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${result} - そぽたんスロット</title>
+  <meta property="og:type" content="website">
   <meta property="og:title" content="${ogpTitle}">
   <meta property="og:description" content="そぽたんスロットを回しました">
   <meta property="og:image" content="${ogpImage}">
   <meta property="og:url" content="${BASE_URL}/result/${encodeURIComponent(result)}.html">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${ogpTitle}">
+  <meta name="twitter:description" content="そぽたんスロットを回しました">
   <meta name="twitter:image" content="${ogpImage}">
   <style>
     body {
