@@ -1,5 +1,5 @@
 {
-  "name": "sopotan-slot",
+  "name": "soposlots",
   "version": "1.0.0",
   "description": "そぽたんスロット",
   "scripts": {
@@ -7,7 +7,7 @@
     "generate:pages": "node generate-pages.js",
     "generate": "npm run generate:ogp && npm run generate:pages",
     "build": "rm -rf public && mkdir public && cp index.html public/ && cp -r image public/ && cp -r result public/",
-    "deploy": "npm run build && wrangler pages deploy public --project-name=sopotan-slot"
+    "deploy": "npm run build && wrangler pages deploy public --project-name=soposlots"
   },
   "dependencies": {
     "canvas": "^3.1.0"
