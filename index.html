@@ -203,6 +203,10 @@
 
     async function tweet() {
       const resultCode = resultToFilename(result);
+
+      // Safariはクリック直後でないとwindow.openをブロックするため、先にウィンドウを開く
+      const tweetWindow = window.open('about:blank', '_blank');
+
       let resultUrl = `${BASE_URL}/result/${resultCode}`;
 
       // 署名を取得
@@ -223,7 +227,13 @@
 
       const text = `そぽたんスロットの結果は「${result}」でした！\n\n#そぽたんスロット\n${resultUrl}`;
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+
+      if (tweetWindow) {
+        tweetWindow.location.href = url;
+      } else {
+        // ポップアップがブロックされた場合はフォールバック
+        window.location.href = url;
+      }
     }
 
     document.getElementById('spin-btn').addEventListener('click', spin);
