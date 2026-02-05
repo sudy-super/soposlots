@@ -5,7 +5,7 @@ node_modules/
 public/
 
 # Generated files
-result/
+/result/
 image/[sptn][sptn][sptn][sptn].png
 
 # Cloudflare
