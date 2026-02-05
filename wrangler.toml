@@ -1,2 +1,6 @@
 name = "sopotan-slot"
 pages_build_output_dir = "./public"
+
+# 環境変数はCloudflareダッシュボードで設定してください
+# Settings > Environment variables > SIGNING_SECRET
+# ローカル開発時は .dev.vars ファイルに SIGNING_SECRET=xxx を設定

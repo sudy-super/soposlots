@@ -201,8 +201,26 @@
       return result.split('').map(c => CHAR_MAP[c]).join('');
     }
 
-    function tweet() {
-      const resultUrl = `${BASE_URL}/result/${resultToFilename(result)}`;
+    async function tweet() {
+      const resultCode = resultToFilename(result);
+      let resultUrl = `${BASE_URL}/result/${resultCode}`;
+
+      // 署名を取得
+      try {
+        const response = await fetch('/api/sign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ result: resultCode })
+        });
+        if (response.ok) {
+          const { sig, ts } = await response.json();
+          resultUrl = `${BASE_URL}/result/${resultCode}?sig=${sig}&ts=${ts}`;
+        }
+      } catch (e) {
+        // 署名取得に失敗した場合は署名なしURLを使用
+        console.error('Failed to get signature:', e);
+      }
+
       const text = `そぽたんスロットの結果は「${result}」でした！\n\n#そぽたんスロット\n${resultUrl}`;
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
