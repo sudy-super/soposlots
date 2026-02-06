@@ -5,8 +5,8 @@ interface Env {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { result } = await context.request.json() as { result: string };
 
-  // 結果の検証（sptn, ssss など4文字のみ許可）
-  if (!/^[sptn]{4}$/.test(result)) {
+  // 結果の検証（sptn, ssss, gktn など許可）
+  if (!/^[sptn]{4}$/.test(result) && result !== 'gktn') {
     return new Response('Invalid result', { status: 400 });
   }
 

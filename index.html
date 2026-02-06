@@ -61,18 +61,18 @@
       background: #1da1f2;
       color: white;
     }
-    #sopotan-image {
+    #sopotan-image, #gukitan-image {
       display: none;
       margin: 40px 0;
       opacity: 0;
       transform: scale(0.5);
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
-    #sopotan-image.show {
+    #sopotan-image.show, #gukitan-image.show {
       opacity: 1;
       transform: scale(1);
     }
-    #sopotan-image img {
+    #sopotan-image img, #gukitan-image img {
       max-width: 100%;
       height: auto;
     }
@@ -94,6 +94,9 @@
   </div>
   <div id="sopotan-image">
     <img src="image/sopotan.png" alt="そぽたん">
+  </div>
+  <div id="gukitan-image">
+    <img src="image/gukitan.png" alt="ぐきたん">
   </div>
   <div id="cooldown"></div>
   <button id="spin-btn">まわす</button>
@@ -138,17 +141,24 @@
       document.getElementById('slot-container').classList.remove('fade-out');
       document.getElementById('sopotan-image').style.display = 'none';
       document.getElementById('sopotan-image').classList.remove('show');
+      document.getElementById('gukitan-image').style.display = 'none';
+      document.getElementById('gukitan-image').classList.remove('show');
 
       // テストモード: URLパラメータで結果を指定可能
       const testResult = params.get('test');
       const finalChars = (testResult && testResult.length === 4)
         ? testResult.split('')
         : (() => {
-            // 1/100の確率でそぽたんを出す
-            if (Math.random() < 0.01) {
+            const rand = Math.random();
+            // 0.5%の確率でぐきたんを出す
+            if (rand < 0.005) {
+              return ['ぐ', 'き', 'た', 'ん'];
+            }
+            // 1%の確率でそぽたんを出す
+            if (rand < 0.015) {
               return ['そ', 'ぽ', 'た', 'ん'];
             }
-            // それ以外はランダム（そぽたんにならないように）
+            // それ以外はランダム（そぽたん・ぐきたんにならないように）
             let chars;
             do {
               chars = [0, 1, 2, 3].map(() => CHARS[Math.floor(Math.random() * 4)]);
@@ -175,17 +185,19 @@
               document.getElementById('tweet-btn').style.display = 'inline-block';
               isSpinning = false;
               checkCooldown();
-              // そぽたんが揃った時の特別演出
-              if (result === 'そぽたん') {
+              // そぽたん・ぐきたんが揃った時の特別演出
+              const specialImageId = result === 'そぽたん' ? 'sopotan-image'
+                : result === 'ぐきたん' ? 'gukitan-image' : null;
+              if (specialImageId) {
                 setTimeout(() => {
                   document.getElementById('slot-container').classList.add('fade-out');
                   setTimeout(() => {
                     document.getElementById('slot-container').style.display = 'none';
-                    const sopotanImage = document.getElementById('sopotan-image');
-                    sopotanImage.style.display = 'block';
+                    const specialImage = document.getElementById(specialImageId);
+                    specialImage.style.display = 'block';
                     // 強制的にリフローを発生させてからアニメーション開始
-                    sopotanImage.offsetHeight;
-                    sopotanImage.classList.add('show');
+                    specialImage.offsetHeight;
+                    specialImage.classList.add('show');
                   }, 300);
                 }, 500);
               }
@@ -196,7 +208,7 @@
     }
 
     // 日本語結果を英数字ファイル名に変換
-    const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n' };
+    const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n', 'ぐ': 'g', 'き': 'k' };
     function resultToFilename(result) {
       return result.split('').map(c => CHAR_MAP[c]).join('');
     }

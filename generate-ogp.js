@@ -5,6 +5,7 @@ const path = require('path');
 const OUTPUT_DIR = path.join(__dirname, 'image');
 const CHARS = ['そ', 'ぽ', 'た', 'ん'];
 const SOPOTAN_IMAGE = path.join(__dirname, 'image', 'sopotan.png');
+const GUKITAN_IMAGE = path.join(__dirname, 'image', 'gukitan.png');
 
 // 日本語結果を英数字ファイル名に変換
 const CHAR_MAP = { 'そ': 's', 'ぽ': 'p', 'た': 't', 'ん': 'n' };
@@ -127,8 +128,9 @@ async function main() {
 
   console.log('OGP画像を生成中...');
 
-  // sopotan.pngを読み込み
+  // 特別画像を読み込み
   const sopotanImg = await loadImage(SOPOTAN_IMAGE);
+  const gukitanImg = await loadImage(GUKITAN_IMAGE);
 
   // index.html用のOGP画像を生成
   const indexOgpBuffer = generateIndexOGP();
@@ -155,6 +157,11 @@ async function main() {
       }
     }
   }
+
+  // ぐきたんのOGP画像を生成
+  const gukitanBuffer = await generateSopotanOGP(gukitanImg);
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'gktn.png'), gukitanBuffer);
+  count++;
 
   console.log(`完了！ imageフォルダに${count}枚の画像を生成しました`);
 }

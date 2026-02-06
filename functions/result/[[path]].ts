@@ -7,6 +7,8 @@ const CHAR_MAP: Record<string, string> = {
   p: 'ぽ',
   t: 'た',
   n: 'ん',
+  g: 'ぐ',
+  k: 'き',
 };
 const BASE_URL = 'https://soposlots.sudy.me';
 const VALIDITY_SECONDS = 30 * 60; // 30分
@@ -17,7 +19,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   const resultCode = pathParts[pathParts.length - 1]?.replace('.html', '');
 
   // 結果コードの検証
-  if (!/^[sptn]{4}$/.test(resultCode)) {
+  if (!/^[sptn]{4}$/.test(resultCode) && resultCode !== 'gktn') {
     return new Response('Not Found', { status: 404 });
   }
 
@@ -26,10 +28,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     .map((c) => CHAR_MAP[c])
     .join('');
   const isSopotan = resultCode === 'sptn';
+  const isGukitan = resultCode === 'gktn';
+  const isSpecial = isSopotan || isGukitan;
 
-  // 署名検証（そぽたんの場合のみ）
+  // 署名検証（そぽたん・ぐきたんの場合のみ）
   let isValidSignature = false;
-  if (isSopotan) {
+  if (isSpecial) {
     const sig = url.searchParams.get('sig');
     const ts = url.searchParams.get('ts');
 
@@ -74,19 +78,21 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   let ogpImage: string;
   let ogpTitle: string;
 
-  if (isSopotan) {
-    // そぽたんの場合は署名検証の結果でOGPを切り替え
+  if (isSpecial) {
+    // そぽたん・ぐきたんの場合は署名検証の結果でOGPを切り替え
     ogpImage = isValidSignature
-      ? `${BASE_URL}/image/sptn.png`
+      ? `${BASE_URL}/image/${resultCode}.png`
       : `${BASE_URL}/image/ogp.png`;
-    ogpTitle = isValidSignature ? 'そぽ〜' : 'そぽたんスロットを回しました';
+    ogpTitle = isValidSignature
+      ? (isSopotan ? 'そぽ〜' : 'ぐき〜')
+      : 'そぽたんスロットを回しました';
   } else {
-    // そぽたん以外は本来のOGP画像を表示
+    // それ以外は本来のOGP画像を表示
     ogpImage = `${BASE_URL}/image/${resultCode}.png`;
     ogpTitle = 'そぽたんになれませんでした...';
   }
 
-  const html = generateHTML(result, resultCode, ogpImage, ogpTitle, isSopotan);
+  const html = generateHTML(result, resultCode, ogpImage, ogpTitle, isSpecial);
 
   return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -98,14 +104,18 @@ function generateHTML(
   resultCode: string,
   ogpImage: string,
   ogpTitle: string,
-  isSopotan: boolean
+  isSpecial: boolean
 ): string {
-  const message = isSopotan
+  const isSopotan = resultCode === 'sptn';
+  const isGukitan = resultCode === 'gktn';
+  const message = isSpecial
     ? 'が出ました！'
     : '残念！そぽたんになれませんでした...';
   const resultDisplay = isSopotan
     ? `<img src="../image/sopotan.png" alt="そぽたん">`
-    : result;
+    : isGukitan
+      ? `<img src="../image/gukitan.png" alt="ぐきたん">`
+      : result;
 
   return `<!DOCTYPE html>
 <html lang="ja">
