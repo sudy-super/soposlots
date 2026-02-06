@@ -144,8 +144,8 @@
       const finalChars = (testResult && testResult.length === 4)
         ? testResult.split('')
         : (() => {
-            // 1/10の確率でそぽたんを出す
-            if (Math.random() < 0.1) {
+            // 1/100の確率でそぽたんを出す
+            if (Math.random() < 0.01) {
               return ['そ', 'ぽ', 'た', 'ん'];
             }
             // それ以外はランダム（そぽたんにならないように）
